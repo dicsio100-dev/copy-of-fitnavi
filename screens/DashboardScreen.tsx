@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { User } from '../types';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip, BarChart, Bar } from 'recharts';
 import { getDailyStats, calculateStreak, getWeeklyStats, getUserXP } from '../src/lib/api';
@@ -12,10 +13,11 @@ import { WorkoutLog } from '../src/lib/api';
 
 interface DashboardScreenProps {
   user: User;
-  onStartWorkout: () => void;
+  onStartWorkout?: () => void;
 }
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onStartWorkout }) => {
+  const navigate = useNavigate();
   const [streak, setStreak] = useState(0);
   const [xp, setXp] = useState(0);
   const [dailyStats, setDailyStats] = useState({
@@ -76,7 +78,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onStartWorkout 
   );
 
   return (
-    <div className="relative w-full text-white">
+    <div className="relative w-full text-white pb-24 md:pb-0">
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
 
         {/* HEADER AREA */}
@@ -102,7 +104,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onStartWorkout 
           </div>
         </div>
 
-        {/* PERFORMANCE OVERVIEW (Desktop: Top Right, Mobile: Second) */}
+        {/* PERFORMANCE OVERVIEW */}
         <div className="md:col-span-4 glass-card rounded-2xl p-6 md:p-8 flex flex-col">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-black uppercase tracking-tight text-white">Performance</h3>
@@ -131,25 +133,28 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onStartWorkout 
         {/* CENTRAL FOCUS: HUMAN SILHOUETTE */}
         <div className="md:col-span-8 md:row-span-4 glass-card rounded-2xl min-h-[450px] md:h-[600px] relative overflow-hidden flex flex-col">
           <div className="absolute top-6 left-6 flex items-center gap-2 z-20">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-active-glow" />
-            <span className="text-[10px] font-black text-primary tracking-widest uppercase">Physio_Scan // Active</span>
+            <div className="w-2 h-2 rounded-full bg-[#00FFAA] animate-pulse shadow-[0_0_10px_#00FFAA]" />
+            <span className="text-[10px] font-black text-[#00FFAA] tracking-widest uppercase">Physio_Scan // Active</span>
           </div>
 
           <div className="flex-1 relative z-10 w-full">
-            <BodyScanner workoutLogs={workoutLogs} />
+            <BodyScanner
+              workoutLogs={workoutLogs}
+              userLevel={user.level === 1 ? 'Débutant' : 'Avancé'}
+            />
           </div>
 
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full px-8 text-center">
+          <div className="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full px-8 text-center items-center justify-center">
             <button
-              onClick={onStartWorkout}
-              className="w-full max-w-sm py-4 bg-primary text-background-dark font-black uppercase tracking-widest rounded-xl shadow-active-glow hover:scale-105 active:scale-95 transition-all"
+              onClick={() => navigate('/workout')}
+              className="px-12 py-4 bg-[#00FFAA] text-black font-black uppercase tracking-[0.2em] rounded-xl shadow-[0_0_20px_rgba(0,255,170,0.4)] hover:shadow-[0_0_30px_rgba(0,255,170,0.6)] active:scale-95 transition-all animate-neon-pulse"
             >
               Start Session
             </button>
           </div>
         </div>
 
-        {/* HOLISTIC HEALTH (Mobile: after silhouette, Desktop: Side) */}
+        {/* HOLISTIC HEALTH */}
         <div className="md:col-span-4 glass-card rounded-2xl p-6 flex flex-col gap-6">
           <h3 className="text-lg font-black uppercase tracking-tight text-white mb-2">Biometrics</h3>
           <div className="flex justify-around items-center">
@@ -180,7 +185,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onStartWorkout 
           </div>
         </div>
 
-        {/* WEEKLY ACTIVITY (Bottom Panels) */}
+        {/* WEEKLY ACTIVITY */}
         <div className="md:col-span-4 glass-card rounded-2xl p-6 flex flex-col h-[250px]">
           <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Weekly Intensity</h3>
           <div className="flex-1">
@@ -224,7 +229,27 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onStartWorkout 
 
       </div>
 
+      {/* MOBILE FIXED START BUTTON */}
+      <div className="md:hidden fixed bottom-[72px] left-1/2 -translate-x-1/2 z-[110] w-full px-4 flex justify-center pointer-events-none">
+        <button
+          onClick={() => navigate('/workout')}
+          className="w-full max-w-sm py-4 bg-[#00FFAA] text-black font-black uppercase tracking-[0.2em] rounded-xl shadow-[0_0_20px_rgba(0,255,170,0.5)] active:scale-90 transition-all animate-neon-pulse pointer-events-auto"
+        >
+          Start Session
+        </button>
+      </div>
+
       <AICoachWidget />
+
+      <style>{`
+        @keyframes neon-pulse {
+          0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 170, 0.4); }
+          50% { box-shadow: 0 0 40px rgba(0, 255, 170, 0.8); }
+        }
+        .animate-neon-pulse {
+          animation: neon-pulse 2s infinite ease-in-out;
+        }
+      `}</style>
     </div>
   );
 };
