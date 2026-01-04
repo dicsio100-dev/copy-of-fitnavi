@@ -21,7 +21,7 @@ const WelcomeScreen: React.FC = () => {
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center gap-8 px-6 text-center max-w-lg">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center text-background-dark shadow-[0_0_30px_rgba(19,236,91,0.5)]">
+          <div className="w-20 h-20 bg-primary/20 rounded-3xl flex items-center justify-center text-primary border border-primary/30 shadow-active-glow animate-pulse">
             <span className="material-symbols-outlined text-5xl font-bold">bolt</span>
           </div>
           <h1 className="text-6xl font-black tracking-tighter text-white">FitNavi</h1>
@@ -31,7 +31,7 @@ const WelcomeScreen: React.FC = () => {
         <div className="flex flex-col gap-4 w-full">
           <button
             onClick={() => setAuthModal({ isOpen: true, view: 'login' })}
-            className="w-full bg-primary hover:bg-emerald-400 text-background-dark py-4 rounded-2xl font-bold text-lg transition-all shadow-lg transform active:scale-95"
+            className="w-full bg-primary hover:opacity-90 text-background-dark py-4 rounded-2xl font-bold text-lg transition-all shadow-active-glow transform active:scale-95"
           >
             Se connecter
           </button>

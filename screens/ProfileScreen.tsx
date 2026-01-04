@@ -113,59 +113,59 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ user, onLogout, onUpdateP
   };
 
   return (
-    <div className="max-w-[1440px] mx-auto w-full p-6 md:p-12 flex flex-col xl:flex-row gap-12 pb-32 animate-in fade-in duration-700">
-      <aside className="w-full xl:w-[380px] shrink-0 flex flex-col gap-8">
-        <div className="bg-surface-dark rounded-[2.5rem] p-10 border border-white/5 relative overflow-hidden text-center flex flex-col items-center group">
+    <div className="max-w-[1600px] mx-auto w-full p-4 sm:p-6 md:p-10 flex flex-col xl:flex-row gap-8 md:gap-12 animate-in fade-in duration-700">
+      <aside className="w-full xl:w-[400px] shrink-0 flex flex-col gap-6 md:gap-8">
+        <div className="glass-card rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden text-center flex flex-col items-center group">
           <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary/10 to-transparent"></div>
           <div className="relative mb-6">
-            <div className="w-40 h-40 rounded-full border-4 border-primary p-1 bg-surface-dark relative">
+            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-primary p-1 bg-background-dark relative shadow-[0_0_30px_rgba(16,185,129,0.2)]">
               <div
                 className="w-full h-full rounded-full bg-cover bg-center"
                 style={{ backgroundImage: `url('${user.avatar_url || "https://picsum.photos/seed/fitnavi/400/400"}')` }}
               ></div>
               <button
                 onClick={generateAIAvatar}
-                className="absolute bottom-0 right-0 p-2 bg-primary rounded-full hover:scale-110 transition-transform shadow-lg border-4 border-surface-dark"
+                className="absolute bottom-0 right-0 p-2 bg-primary rounded-full hover:scale-110 transition-transform shadow-lg border-4 border-background-dark"
                 title="Générer Avatar IA"
               >
                 <span className="material-symbols-outlined text-background-dark font-black">autorenew</span>
               </button>
             </div>
-            <div className="absolute -bottom-2 -left-2 bg-background-dark text-white text-xs font-black px-4 py-1.5 rounded-full border-2 border-white/10">NIV. {displayLevel}</div>
+            <div className="absolute -bottom-2 -left-2 bg-background-dark text-white text-[10px] font-black px-4 py-1.5 rounded-full border border-primary/30">NIV. {displayLevel}</div>
           </div>
-          <h2 className="text-3xl font-black text-white">{displayName}</h2>
-          <p className="text-primary font-black uppercase text-[10px] tracking-widest mt-1">Premium Member</p>
+          <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight">{displayName}</h2>
+          <p className="text-primary font-black uppercase text-[10px] tracking-[0.3em] mt-2">Premium_Access</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-surface-dark rounded-[2rem] p-6 border border-white/5 hover:border-primary/20 transition-all group">
-            <StatField label="Poids Actuel" value={user.weight} fieldName="weight" unit="kg" />
-            <div className="mt-2 text-[10px] uppercase tracking-widest text-gray-500">
-              Objectif: <span className="text-primary font-bold">{targetWeight} kg</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="glass-card rounded-[2rem] p-6 group">
+            <StatField label="Poids_Index" value={user.weight} fieldName="weight" unit="kg" />
+            <div className="mt-2 text-[10px] uppercase tracking-widest text-gray-500 font-bold">
+              Target: <span className="text-primary">{targetWeight} kg</span>
             </div>
           </div>
-          <div className="bg-surface-dark rounded-[2rem] p-6 border border-white/5 hover:border-primary/20 transition-all">
-            <StatField label="Taille" value={user.height} fieldName="height" unit="cm" />
+          <div className="glass-card rounded-[2rem] p-6">
+            <StatField label="Height_Stats" value={user.height} fieldName="height" unit="cm" />
           </div>
-          <div className="bg-surface-dark rounded-[2rem] p-6 border border-white/5 col-span-2 hover:border-primary/20 transition-all flex items-center justify-between">
+          <div className="glass-card rounded-[2rem] p-6 sm:col-span-2 flex items-center justify-between">
             <div>
-              <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest">IMC (Indice Masse Corporelle)</span>
-              <p className="text-3xl font-black text-white">
+              <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest">IMC_Calculus</span>
+              <p className="text-2xl md:text-3xl font-black text-white">
                 {user.height && user.weight ? (user.weight / ((user.height / 100) ** 2)).toFixed(1) : "--"}
               </p>
             </div>
-            <div className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-white/10 ${(user.height && user.weight && (user.weight / ((user.height / 100) ** 2)) > 25) ? 'bg-orange-500/20 text-orange-500' : 'bg-primary/20 text-primary'
+            <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border border-white/10 ${(user.height && user.weight && (user.weight / ((user.height / 100) ** 2)) > 25) ? 'bg-orange-500/20 text-orange-500' : 'bg-primary/20 text-primary'
               }`}>
-              {(user.height && user.weight && (user.weight / ((user.height / 100) ** 2)) > 25) ? 'Surpoids' : 'Normal'}
+              {(user.height && user.weight && (user.weight / ((user.height / 100) ** 2)) > 25) ? 'Surpoids' : 'Optimal'}
             </div>
           </div>
         </div>
 
-        <button onClick={onLogout} className="w-full bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white py-5 rounded-[1.5rem] font-black uppercase tracking-widest border border-red-500/20 transition-all active:scale-95">Déconnexion</button>
+        <button onClick={onLogout} className="w-full bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white py-5 rounded-2xl font-black uppercase tracking-widest border border-red-500/20 transition-all active:scale-95 text-xs">Terminer_Session</button>
       </aside>
 
-      <main className="flex-1 flex flex-col gap-10">
-        <h1 className="text-5xl font-black text-white tracking-tighter">Paramètres</h1>
+      <main className="flex-1 flex flex-col gap-8 md:gap-10">
+        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tighter uppercase">Settings</h1>
         <div className="flex gap-2 bg-surface-dark p-1 rounded-2xl w-fit border border-white/5 overflow-x-auto max-w-full">
           {['Vue d\'ensemble', 'Objectifs', 'Matériel'].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} className={`px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 whitespace-nowrap ${activeTab === tab ? 'bg-primary text-background-dark shadow-lg' : 'text-gray-500 hover:text-white'}`}>{tab}</button>

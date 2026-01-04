@@ -117,7 +117,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="h-full w-full bg-[#102216]">
+    <div className="min-h-[100dvh] w-full bg-background-dark font-sans selection:bg-primary/30 selection:text-white">
       <Routes>
         {/* Public Routes */}
         <Route path="/welcome" element={!session ? <WelcomeScreen /> : <Navigate to="/" />} />

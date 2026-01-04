@@ -13,6 +13,7 @@
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
+    <link rel="icon" type="image/png" href="/Logo.png" />
 
     <!-- PWA PROTOCOL (MOBILE HUD) -->
     <link rel="manifest" href="/manifest.json" />
@@ -28,28 +29,26 @@
             theme: {
                 extend: {
                     colors: {
-                        // Cyber-Analyse Palette
-                        "primary": "#14f163",           // Vert Néon (Données & Succès)
-                        "primary-dark": "#10c14f",
-                        "neon-red": "#ff003c",          // Rouge Néon (Fatigue & Limites)
-                        "background-dark": "#020502",   // Noir Tactique
-                        "surface-dark": "rgba(10, 20, 10, 0.7)",
-                        "surface-dark-lighter": "#152a1b",
-                        "border-dark": "rgba(20, 241, 99, 0.3)",
-                        "text-secondary": "#9db9a6",
+                        "primary": "#10b981",           // Emerald Green
+                        "primary-dark": "#059669",
+                        "neon-red": "#ff003c",
+                        "background-dark": "#010a05",   // Cyber-Green Black
+                        "surface-glass": "rgba(0, 0, 0, 0.6)",
+                        "border-glass": "rgba(16, 185, 129, 0.15)",
+                        "text-secondary": "#6b7280",
                     },
                     fontFamily: {
                         "sans": ["Inter", "sans-serif"],
-                        "heading": ["Oswald", "sans-serif"],        // Titres industriels
-                        "mono": ["JetBrains Mono", "monospace"],    // Données scientifiques
+                        "heading": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
                     },
-                    backdropBlur: {
-                        'xs': '2px',
+                    borderRadius: {
+                        'nebula': '2.5rem',
+                        'bubble': '1.25rem',
                     },
                     boxShadow: {
-                        'neon': '0 0 20px rgba(20, 241, 99, 0.15)',
-                        'neon-strong': '0 0 30px rgba(20, 241, 99, 0.4)',
-                        'neon-red': '0 0 20px rgba(255, 0, 60, 0.3)',
+                        'glass-glow': '0 0 30px rgba(16, 185, 129, 0.05), inset 0 0 1px rgba(255, 255, 255, 0.05)',
+                        'active-glow': '0 0 40px rgba(16, 185, 129, 0.2)',
                     }
                 },
             },
@@ -61,25 +60,42 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
-        .material-symbols-filled {
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        /* CYBER-GREEN PREMIUM CORE */
+        html,
+        body {
+            height: 100%;
+            min-height: 100dvh;
+            background-color: #010a05;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* SCROLLBAR CYBER */
-        ::-webkit-scrollbar {
-            width: 2px;
-            height: 2px;
+        /* RESPONSIVE TYPOGRAPHY (HUD STYLE) */
+        h1 {
+            font-size: clamp(1.5rem, 5vw, 3rem);
+            font-weight: 900;
+            letter-spacing: -0.05em;
         }
 
-        ::-webkit-scrollbar-track {
-            background: transparent;
+        h2 {
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            font-weight: 800;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: #14f163;
-            box-shadow: 0 0 10px rgba(20, 241, 99, 0.8);
+        h3 {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            font-weight: 700;
         }
 
+        .text-hud {
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* SCROLLBAR HIDE UTILITY */
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
@@ -89,258 +105,90 @@
             scrollbar-width: none;
         }
 
-        /* GLOBAL STYLES */
-        html,
-        body,
-        #root {
-            height: 100dvh;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: #020502;
-            font-family: 'Inter', sans-serif;
+        /* HEX GRID OVERLAY */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='104' viewBox='0 0 60 104' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 104L0 86.6666667V52L30 34.6666667L60 52V86.6666667L30 104ZM30 71.3333333L15 62.6666667V45.3333333L30 36.6666667L45 45.3333333V62.6666667L30 71.3333333Z' fill='%2310b981' fill-opacity='0.03'/%3E%3C/svg%3E");
+            background-size: 30px 52px;
+            pointer-events: none;
+            z-index: -7;
+            opacity: 0.8;
         }
 
-        /* Typography Hierarchy */
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-family: 'Oswald', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 700;
+        .nebula-bg {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05) 0%, transparent 60%),
+                radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.03) 0%, transparent 40%);
+            filter: blur(80px);
+            z-index: -9;
+            pointer-events: none;
         }
 
-        /* Data Display - Monospace for precision */
-        .data-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
+        /* ORGANIC SMOKE LAYER */
+        .smoke-layer {
+            position: fixed;
+            inset: -50%;
+            background: url("https://www.transparenttextures.com/patterns/asfalt-dark.png");
+            opacity: 0.1;
+            filter: contrast(150%) brightness(50%) hue-rotate(90deg);
+            z-index: -8;
+            pointer-events: none;
+            animation: drift 60s linear infinite;
         }
 
-        /* CYBER-CARD COMPONENT */
-        .cyber-card {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(20, 241, 99, 0.3);
-            box-shadow: 0 0 20px rgba(20, 241, 99, 0.15);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .cyber-card:hover {
-            border-color: rgba(20, 241, 99, 0.5);
-            box-shadow: 0 0 30px rgba(20, 241, 99, 0.25);
-        }
-
-        /* CYBER-CARD VARIANTS */
-        .cyber-card-alert {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 0, 60, 0.4);
-            box-shadow: 0 0 20px rgba(255, 0, 60, 0.2);
-        }
-
-        .cyber-card-alert:hover {
-            border-color: rgba(255, 0, 60, 0.6);
-            box-shadow: 0 0 30px rgba(255, 0, 60, 0.3);
-        }
-
-        /* FADE ANIMATIONS */
-        .fade-enter {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-
-        .fade-enter-active {
-            opacity: 1;
-            transform: translateY(0);
-            transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        /* SCAN ANIMATION */
-        @keyframes scan {
-            0% {
-                top: 0;
-                opacity: 0;
-            }
-
-            50% {
-                opacity: 1;
-            }
-
-            100% {
-                top: 100%;
-                opacity: 0;
-            }
-        }
-
-        .animate-scan {
-            animation: scan 4s ease-in-out infinite;
-        }
-
-        /* PULSE GLOW ANIMATION */
-        @keyframes pulse-glow {
-
-            0%,
-            100% {
-                box-shadow: 0 0 10px rgba(20, 241, 99, 0.2);
-            }
-
-            50% {
-                box-shadow: 0 0 25px rgba(20, 241, 99, 0.4);
-            }
-        }
-
-        .animate-pulse-glow {
-            animation: pulse-glow 2s ease-in-out infinite;
-        }
-
-        /* 3D BADGE ROTATION */
-        @keyframes spin-slow {
+        @keyframes drift {
             from {
-                transform: rotateY(0deg);
+                transform: rotate(0deg) scale(1);
             }
 
             to {
-                transform: rotateY(360deg);
+                transform: rotate(360deg) scale(1.1);
             }
         }
 
-        .animate-spin-slow {
-            animation: spin-slow 8s linear infinite;
-            transform-style: preserve-3d;
+        .glass-card {
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(16, 185, 129, 0.1);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* CRT SCANLINES EFFECT */
-        .crt-scanlines::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(0deg,
-                    rgba(0, 0, 0, 0.15) 0px,
-                    transparent 1px,
-                    transparent 2px,
-                    rgba(0, 0, 0, 0.15) 3px);
-            pointer-events: none;
-            z-index: 1000;
+        .glass-card:hover {
+            background: rgba(0, 0, 0, 0.75);
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.1);
         }
 
-        /* FLOATING PARTICLES */
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0px) translateX(0px);
-                opacity: 0.3;
-            }
-
-            50% {
-                transform: translateY(-20px) translateX(10px);
-                opacity: 0.6;
-            }
-        }
-
-        .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: #14f163;
+        /* NEON PEDESTAL (GREEN) */
+        .neon-pedestal {
+            width: clamp(200px, 50vw, 350px);
+            height: clamp(30px, 10vw, 50px);
+            background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.4) 0%, transparent 70%);
+            border-bottom: 2px solid rgba(16, 185, 129, 0.8);
             border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
+            position: relative;
+            filter: blur(1px);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.3);
         }
 
-        /* DATA GRID LINES */
-        .grid-lines {
-            background-image:
-                linear-gradient(rgba(20, 241, 99, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(20, 241, 99, 0.05) 1px, transparent 1px);
-            background-size: 20px 20px;
+        .nav-active {
+            color: #10b981 !important;
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
         }
 
-        /* NOISE BACKGROUND */
-        .noise-bg {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            opacity: 0.05;
-            pointer-events: none;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-        }
-
-        /* NEON GLOWS */
-        .neon-text {
-            text-shadow: 0 0 10px rgba(20, 241, 99, 0.5), 0 0 20px rgba(20, 241, 99, 0.2);
-        }
-
-        .neon-text-red {
-            text-shadow: 0 0 10px rgba(255, 0, 60, 0.5), 0 0 20px rgba(255, 0, 60, 0.2);
-        }
-
-        /* HUD CORNERS GENERATIVE */
-        .border-tl-hud {
-            border-left: 2px solid #14f163;
-            border-top: 2px solid #14f163;
-        }
-
-        .border-tr-hud {
-            border-right: 2px solid #14f163;
-            border-top: 2px solid #14f163;
-        }
-
-        .border-bl-hud {
-            border-left: 2px solid #14f163;
-            border-bottom: 2px solid #14f163;
-        }
-
-        .border-br-hud {
-            border-right: 2px solid #14f163;
-            border-bottom: 2px solid #14f163;
-        }
-
-        /* GLITCH ANIMATION */
-        @keyframes terminal-glitch {
-            0% {
-                transform: translate(0);
-                opacity: 1;
-            }
-
-            92% {
-                transform: translate(0);
-                opacity: 1;
-            }
-
-            93% {
-                transform: translate(2px, 1px);
-                opacity: 0.8;
-            }
-
-            94% {
-                transform: translate(-1px, -2px);
-                opacity: 1;
-            }
-
-            95% {
-                transform: translate(0);
-                opacity: 1;
-            }
-
-            98% {
-                transform: translate(1px, 2px);
-                opacity: 0.8;
-            }
-
-            100% {
-                transform: translate(0);
-                opacity: 1;
-            }
-        }
-
-        .animate-glitch {
-            animation: terminal-glitch 4s linear infinite;
+        /* MOBILE BOTTOM NAV BLUR */
+        .mobile-nav-blur {
+            background: rgba(1, 10, 5, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
         }
     </style>
 

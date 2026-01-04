@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { User } from '../types';
-import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip, BarChart, Bar } from 'recharts';
 import { getDailyStats, calculateStreak, getWeeklyStats, getUserXP } from '../src/lib/api';
 import { supabase } from '../src/lib/supabase';
-import MuscleHeatmap from '@/components/MuscleHeatmap';
-import BodyScanner from '@/components/BodyScanner';
-import SystemTerminal from '@/components/SystemTerminal';
-import ScreenOverlay from '@/components/ScreenOverlay';
+import BodyScanner from '../components/BodyScanner';
+import StatGauge from '../components/StatGauge';
+import AICoachWidget from '../components/AICoachWidget';
+import ParticleBackground from '../components/ParticleBackground';
 import { WorkoutLog } from '../src/lib/api';
 
 interface DashboardScreenProps {
@@ -17,8 +16,6 @@ interface DashboardScreenProps {
 }
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onStartWorkout }) => {
-  const navigate = useNavigate();
-
   const [streak, setStreak] = useState(0);
   const [xp, setXp] = useState(0);
   const [dailyStats, setDailyStats] = useState({
@@ -27,7 +24,6 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onStartWorkout 
     mood: 'Normal' as const
   });
   const [weeklyActivity, setWeeklyActivity] = useState<any[]>([]);
-  const [aiLogs, setAiLogs] = useState<string[]>([]);
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,22 +60,6 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onStartWorkout 
       }
     };
     fetchData();
-
-    const logs = [
-      '&gt; AUTHENTICATION: SUCCESSFUL',
-      '&gt; ANALYSING BIOMETRIC DATA...',
-      '&gt; STATUS: OPERATIONAL',
-      '&gt; RECOVERY ENGINE: OPTIMAL',
-      '&gt; READY FOR COMBAT',
-      '&gt; SYNCING SATELLITE DATA...'
-    ];
-    let index = 0;
-    const interval = setInterval(() => {
-      setAiLogs(prev => [...prev.slice(-4), logs[index % logs.length]]);
-      index++;
-    }, 2500);
-
-    return () => clearInterval(interval);
   }, []);
 
   const recoveryScore = Math.min(
@@ -89,234 +69,162 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ user, onStartWorkout 
     100
   );
 
-  const cardStyle = "bg-[#061109]/60 backdrop-blur-lg border border-[#14f163]/20 shadow-[0_0_15px_rgba(20,241,99,0.2)] rounded-lg p-6 hover:border-[#14f163]/50 hover:shadow-[0_0_30px_rgba(20,241,99,0.3)] transition-all duration-300 relative overflow-hidden";
-
-  if (loading) return null;
+  if (loading) return (
+    <div className="h-full flex items-center justify-center">
+      <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+    </div>
+  );
 
   return (
-    <div className="h-full bg-[#020502] text-white p-6 relative grid-lines overflow-hidden scrollbar-hide">
-      <div className="noise-bg"></div>
+    <div className="relative w-full text-white">
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
 
-      <div className="max-w-[1800px] mx-auto h-full flex flex-col gap-6 relative z-10 overflow-y-auto scrollbar-hide pr-2">
-
-        {/* TOP HEADER COMMANDER */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between border-b border-[#14f163]/20 pb-6"
-        >
-          <div className="flex items-center gap-6">
-            <div className="flex flex-col">
-              <h1 className="text-4xl font-heading font-black tracking-tighter text-white neon-text uppercase italic">
-                FITNAVI <span className="text-primary italic">AI_CORE</span>
-              </h1>
-              <div className="flex items-center gap-3 text-[10px] font-mono text-primary/60">
-                <span>&gt; SECTOR: 07_BRAVO</span>
-                <span className="animate-pulse">SIGNAL: ENCRYPTED_STABLE</span>
-              </div>
-            </div>
+        {/* HEADER AREA */}
+        <div className="md:col-span-8 flex flex-col md:flex-row md:items-center justify-between gap-4 glass-card p-6 md:p-8 rounded-2xl">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tighter text-white drop-shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+              COMMAND <span className="text-primary">CENTER</span>
+            </h1>
+            <p className="text-[10px] font-bold text-primary/60 uppercase tracking-[0.4em]">
+              STATUS: OPERATIONAL_v4.2
+            </p>
           </div>
-
-          <div className="flex items-center gap-12">
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <span className="text-[9px] text-gray-500 font-mono tracking-widest uppercase">&gt; BIO_RECOVERY</span>
-                <p className="text-2xl font-heading font-black text-primary neon-text">{recoveryScore.toFixed(0)}%</p>
-              </div>
-              <div className="relative w-12 h-12">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle cx="24" cy="24" r="21" fill="none" stroke="rgba(20, 241, 99, 0.1)" strokeWidth="3" />
-                  <circle
-                    cx="24" cy="24" r="21" fill="none" stroke="#14f163" strokeWidth="3"
-                    strokeDasharray={131.9}
-                    strokeDashoffset={131.9 * (1 - recoveryScore / 100)}
-                    strokeLinecap="round"
-                    className="drop-shadow-[0_0_5px_#14f163]"
-                  />
-                </svg>
-              </div>
+          <div className="flex items-center gap-6 md:gap-8 justify-between md:justify-end">
+            <div className="text-right">
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Global Streak</p>
+              <p className="text-xl md:text-2xl font-black text-white">{streak} DAYS</p>
             </div>
-
-            <div className="text-right border-l border-white/10 pl-8">
-              <span className="text-[9px] text-gray-500 font-mono tracking-widest uppercase">OPERATIONAL_TIME</span>
-              <p className="text-xl font-heading font-black text-white tracking-widest uppercase">22:45:12</p>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* MAIN GRID */}
-        <div className="grid grid-cols-12 gap-8 flex-1">
-
-          {/* CENTRAL ZONE (Col 1-9) */}
-          <div className="col-span-9 space-y-8">
-
-            {/* HERO PANEL */}
-            <div className="relative group">
-              <div className="absolute -top-1 -left-1 w-6 h-6 border-tl-hud z-20 group-hover:scale-110 transition-transform duration-500" />
-              <div className="absolute -top-1 -right-1 w-6 h-6 border-tr-hud z-20 group-hover:scale-110 transition-transform duration-500" />
-              <div className="absolute -bottom-1 -left-1 w-6 h-6 border-bl-hud z-20 group-hover:scale-110 transition-transform duration-500" />
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 border-br-hud z-20 group-hover:scale-110 transition-transform duration-500" />
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className={`${cardStyle} min-h-[600px] border-[#14f163]/30`}
-              >
-                <div className="absolute top-2 right-4 font-mono text-[8px] text-primary/30">REF_ID: BS-9022-X</div>
-
-                <div className="flex flex-col h-full gap-6">
-                  <div className="flex items-center justify-between p-2 border-b border-white/5 relative z-10">
-                    <div>
-                      <h2 className="text-lg font-heading font-black tracking-widest text-[#14f163] uppercase">
-                        &gt; PHYSIO_SCAN_v3.2
-                      </h2>
-                      <p className="text-[8px] font-mono text-gray-500">BIOMETRIC_FEED_ACTIVE // SYNC_LOCK: 99.8%</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_#14f163]"></div>
-                      <span className="text-[10px] font-mono text-primary uppercase tracking-widest">Analysing</span>
-                    </div>
-                  </div>
-
-                  <div className="flex-1 min-h-[400px]">
-                    <BodyScanner workoutLogs={workoutLogs} />
-                  </div>
-
-                  <div className="flex justify-around items-center bg-black/40 rounded-lg p-4 border border-white/5">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="relative w-10 h-10">
-                        <svg className="w-full h-full -rotate-90">
-                          <circle cx="20" cy="20" r="18" stroke="rgba(255,0,60,0.1)" strokeWidth="2" fill="none" />
-                          <circle cx="20" cy="20" r="18" stroke="#ff003c" strokeWidth="2" fill="none" strokeDasharray="113" strokeDashoffset="40" className="drop-shadow-[0_0_5px_#ff003c]" />
-                        </svg>
-                        <motion.span animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity }} className="material-symbols-outlined absolute inset-0 flex items-center justify-center text-[#ff003c] text-xs">favorite</motion.span>
-                      </div>
-                      <span className="text-[8px] font-mono text-gray-500 uppercase">&gt; HEART_RATE</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="relative w-10 h-10">
-                        <svg className="w-full h-full -rotate-90">
-                          <circle cx="20" cy="20" r="18" stroke="rgba(0,240,255,0.1)" strokeWidth="2" fill="none" />
-                          <circle cx="20" cy="20" r="18" stroke="#00f0ff" strokeWidth="2" fill="none" strokeDasharray="113" strokeDashoffset="30" className="drop-shadow-[0_0_5px_#00f0ff]" />
-                        </svg>
-                        <span className="material-symbols-outlined absolute inset-0 flex items-center justify-center text-[#00f0ff] text-xs">water_drop</span>
-                      </div>
-                      <span className="text-[8px] font-mono text-gray-500 uppercase">&gt; HYDRATION</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="relative w-10 h-10">
-                        <svg className="w-full h-full -rotate-90">
-                          <circle cx="20" cy="20" r="18" stroke="rgba(200,255,0,0.1)" strokeWidth="2" fill="none" />
-                          <circle cx="20" cy="20" r="18" stroke="#c8ff00" strokeWidth="2" fill="none" strokeDasharray="113" strokeDashoffset="50" className="drop-shadow-[0_0_5px_#c8ff00]" />
-                        </svg>
-                        <span className="material-symbols-outlined absolute inset-0 flex items-center justify-center text-[#c8ff00] text-xs">psychology</span>
-                      </div>
-                      <span className="text-[8px] font-mono text-gray-500 uppercase">&gt; NEURAL_FOCUS</span>
-                    </div>
-                  </div>
-
-                  <motion.button
-                    whileHover={{ scale: 1.01, boxShadow: '0 0 40px rgba(20,241,99,0.3)' }}
-                    onClick={onStartWorkout}
-                    className="w-full bg-primary text-black font-heading font-black text-xl py-5 rounded tracking-[0.2em] uppercase transition-all shadow-neon"
-                  >
-                    ▶ INITIATE_SESSION
-                  </motion.button>
-                </div>
-              </motion.div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-8">
-              <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className={cardStyle}>
-                <div className="absolute top-2 right-4 font-mono text-[8px] text-primary/20">DATA: ST-44</div>
-                <h3 className="text-[10px] font-mono text-primary tracking-widest uppercase mb-4">&gt; STREAK_INTEGRITY</h3>
-                <p className="text-5xl font-heading font-black neon-text italic">{streak}<span className="text-xs ml-2 text-gray-500 not-italic uppercase font-mono tracking-tighter">Days_Locked</span></p>
-                <div className="mt-6 flex gap-1.5 h-1.5">
-                  {[...Array(14)].map((_, i) => (
-                    <div key={i} className={`flex-1 rounded-sm ${i < streak ? 'bg-primary shadow-[0_0_5px_#14f163]' : 'bg-white/5'}`}></div>
-                  ))}
-                </div>
-              </motion.div>
-
-              <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className={cardStyle}>
-                <div className="absolute top-2 right-4 font-mono text-[8px] text-primary/20">DATA: XP-09</div>
-                <h3 className="text-[10px] font-mono text-primary tracking-widest uppercase mb-4">&gt; ELITE_PROGRESSION</h3>
-                <p className="text-5xl font-heading font-black neon-text italic">LVL_{Math.floor(xp / 1000)}<span className="text-xs ml-2 text-gray-500 not-italic uppercase font-mono tracking-tighter">{xp % 1000} / 1000 XP</span></p>
-                <div className="mt-6 w-full h-1.5 bg-white/5 rounded-sm overflow-hidden">
-                  <motion.div initial={{ width: 0 }} animate={{ width: `${(xp % 1000) / 10}%` }} className="h-full bg-primary shadow-[0_0_10px_#14f163]" />
-                </div>
-              </motion.div>
-            </div>
-          </div>
-
-          {/* VITAL PANEL (Col 10-12) */}
-          <div className="col-span-3 space-y-8 h-full flex flex-col">
-
-            {/* TERMINAL CARD */}
-            <div className="relative group flex-1 max-h-[350px]">
-              <div className="absolute -top-1 -left-1 w-4 h-4 border-tl-hud z-20 group-hover:scale-110 transition-transform" />
-              <div className="absolute -top-1 -right-1 w-4 h-4 border-tr-hud z-20 group-hover:scale-110 transition-transform" />
-              <div className="absolute -bottom-1 -left-1 w-4 h-4 border-bl-hud z-20 group-hover:scale-110 transition-transform" />
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 border-br-hud z-20 group-hover:scale-110 transition-transform" />
-
-              <div className="h-full bg-black/80 backdrop-blur-xl border border-primary/20 rounded overflow-hidden shadow-neon group-hover:border-primary/50 transition-all duration-300">
-                <SystemTerminal />
-              </div>
-            </div>
-
-            {/* VITAL SENSORS */}
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className={`${cardStyle} flex-1`}>
-              <div className="absolute top-2 right-4 font-mono text-[8px] text-primary/20">SYS_V-5</div>
-              <h3 className="text-[10px] font-mono text-primary tracking-widest uppercase mb-6 neon-text">&gt; VITAL_SENSORS</h3>
-              <div className="space-y-8">
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between items-end">
-                    <span className="text-[10px] text-gray-500 font-mono uppercase tracking-tight italic">&gt; HYDRATION_LEVEL</span>
-                    <span className="text-lg font-heading font-bold text-primary">{dailyStats.hydration_liters.toFixed(1)}L</span>
-                  </div>
-                  <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-primary shadow-[0_0_5px_#14f163]" style={{ width: `${(dailyStats.hydration_liters / 2.5) * 100}%` }}></div>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <div className="flex justify-between items-end">
-                    <span className="text-[10px] text-gray-500 font-mono uppercase tracking-tight italic">&gt; SLEEP_CYCLES</span>
-                    <span className="text-lg font-heading font-bold text-primary">{dailyStats.sleep_hours}H</span>
-                  </div>
-                  <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full bg-primary shadow-[0_0_5px_#14f163]" style={{ width: `${(dailyStats.sleep_hours / 8) * 100}%` }}></div>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-white/5">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-neon-red text-xl animate-pulse">favorite</span>
-                      <span className="text-[10px] text-gray-500 font-mono uppercase italic">&gt; PULSE_STABILITY</span>
-                    </div>
-                    <span className="text-2xl font-heading font-black text-neon-red neon-text-red italic">72_BPM</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* QUICK ACTIONS */}
-            <div className="flex flex-col gap-3">
-              <button onClick={() => navigate('/stats')} className="w-full bg-primary/5 hover:bg-primary/20 border border-primary/20 text-primary py-4 rounded font-mono text-[10px] tracking-widest uppercase transition-all group overflow-hidden relative">
-                <div className="absolute inset-0 bg-primary/20 -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
-                <span className="relative z-10">&gt; DEEP_ANALYZE_BIOMETRICS</span>
-              </button>
-              <button onClick={() => navigate('/profile')} className="w-full bg-primary/5 hover:bg-primary/20 border border-primary/20 text-primary py-4 rounded font-mono text-[10px] tracking-widest uppercase transition-all group overflow-hidden relative">
-                <div className="absolute inset-0 bg-primary/20 -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
-                <span className="relative z-10">&gt; PILOT_CONFIGURATION</span>
-              </button>
+            <div className="h-10 w-px bg-white/10 hidden md:block" />
+            <div className="text-right">
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Growth_XP</p>
+              <p className="text-xl md:text-2xl font-black text-primary italic">LVL {Math.floor(xp / 1000)}</p>
             </div>
           </div>
         </div>
+
+        {/* PERFORMANCE OVERVIEW (Desktop: Top Right, Mobile: Second) */}
+        <div className="md:col-span-4 glass-card rounded-2xl p-6 md:p-8 flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-black uppercase tracking-tight text-white">Performance</h3>
+            <span className="material-symbols-outlined text-primary">trending_up</span>
+          </div>
+          <div className="flex-1 w-full min-h-[150px] md:min-h-[120px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={weeklyActivity}>
+                <defs>
+                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#010a05', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '12px' }}
+                  itemStyle={{ color: '#10b981' }}
+                />
+                <Area type="monotone" dataKey="minutes" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* CENTRAL FOCUS: HUMAN SILHOUETTE */}
+        <div className="md:col-span-8 md:row-span-4 glass-card rounded-2xl min-h-[450px] md:h-[600px] relative overflow-hidden flex flex-col">
+          <div className="absolute top-6 left-6 flex items-center gap-2 z-20">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-active-glow" />
+            <span className="text-[10px] font-black text-primary tracking-widest uppercase">Physio_Scan // Active</span>
+          </div>
+
+          <div className="flex-1 relative z-10 w-full">
+            <BodyScanner workoutLogs={workoutLogs} />
+          </div>
+
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full px-8 text-center">
+            <button
+              onClick={onStartWorkout}
+              className="w-full max-w-sm py-4 bg-primary text-background-dark font-black uppercase tracking-widest rounded-xl shadow-active-glow hover:scale-105 active:scale-95 transition-all"
+            >
+              Start Session
+            </button>
+          </div>
+        </div>
+
+        {/* HOLISTIC HEALTH (Mobile: after silhouette, Desktop: Side) */}
+        <div className="md:col-span-4 glass-card rounded-2xl p-6 flex flex-col gap-6">
+          <h3 className="text-lg font-black uppercase tracking-tight text-white mb-2">Biometrics</h3>
+          <div className="flex justify-around items-center">
+            <StatGauge
+              value={dailyStats.sleep_hours}
+              max={8}
+              label="Sleep"
+              subLabel={dailyStats.sleep_hours >= 7 ? "Optimal" : "Deficit"}
+              color="#10b981"
+            />
+            <StatGauge
+              value={recoveryScore}
+              max={100}
+              label="Recovery"
+              subLabel="Score"
+              color={recoveryScore > 80 ? "#10b981" : "#facc15"}
+            />
+          </div>
+
+          <div className="bg-white/5 rounded-2xl p-4 mt-2">
+            <div className="flex justify-between items-end mb-2">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hydration</p>
+              <p className="text-xs font-black text-white">{dailyStats.hydration_liters}L / 2.5L</p>
+            </div>
+            <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full bg-primary" style={{ width: `${(dailyStats.hydration_liters / 2.5) * 100}%` }} />
+            </div>
+          </div>
+        </div>
+
+        {/* WEEKLY ACTIVITY (Bottom Panels) */}
+        <div className="md:col-span-4 glass-card rounded-2xl p-6 flex flex-col h-[250px]">
+          <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Weekly Intensity</h3>
+          <div className="flex-1">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={weeklyActivity}>
+                <Tooltip
+                  cursor={{ fill: 'rgba(16,185,129,0.05)' }}
+                  contentStyle={{ backgroundColor: '#010a05', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '8px' }}
+                />
+                <Bar dataKey="minutes" fill="#10b981" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* PERFORMANCE ANALYTICS */}
+        <div className="md:col-span-4 glass-card rounded-2xl p-6 flex flex-col justify-between gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col justify-center border-r border-white/5 pr-2">
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Index_S</p>
+              <p className="text-2xl font-black text-white">84.2</p>
+            </div>
+            <div className="flex flex-col justify-center pl-2">
+              <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">VO2_Est</p>
+              <p className="text-2xl font-black text-white">52</p>
+            </div>
+          </div>
+          <div className="pt-4 border-t border-white/5">
+            <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${(xp % 1000) / 10}%` }}
+                className="h-full bg-primary shadow-active-glow"
+              />
+            </div>
+            <p className="text-[9px] font-bold text-slate-500 text-center mt-2 uppercase">
+              {1000 - (xp % 1000)} XP TO NEXT LEVEL
+            </p>
+          </div>
+        </div>
+
       </div>
 
-      <ScreenOverlay />
+      <AICoachWidget />
     </div>
   );
 };

@@ -44,120 +44,81 @@ const BodyScanner: React.FC<BodyScannerProps> = ({ workoutLogs = [] }) => {
         return Array.from(muscles).map(m => ({ name: m, muscles: [m] }));
     }, [workoutLogs]);
 
-    const hasMuscle = (name: string) => activeMuscles.some(m => m.name === name);
+    const muscleData = activeMuscles; // Renamed for clarity with the provided snippet
 
     return (
-        <div className="relative w-full h-full min-h-[550px] flex flex-col items-center justify-center p-8 overflow-hidden bg-black/20">
+        <div className="relative w-full h-full min-h-[500px] flex flex-col items-center justify-center overflow-hidden">
+            {/* 1. HOLOGRAM CONTAINER */}
+            <div className="hologram-container relative w-full h-full flex flex-col items-center justify-center">
 
-            {/* 1. HOLOGRAM CONTAINER (3D PERSPECTIVE & SHADER) */}
-            <div className="hologram-container relative w-full h-full flex flex-col items-center justify-center py-10">
+                {/* DEFINITIONS POUR LES GRADIENTS ET FILTRES */}
+                <svg style={{ height: 0, width: 0, position: 'absolute' }}>
+                    <defs>
+                        <linearGradient id="muscleGlowGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stopColor="#10b981" stopOpacity="0.8" />
+                            <stop offset="50%" stopColor="#10b981" stopOpacity="0.4" />
+                            <stop offset="100%" stopColor="#10b981" stopOpacity="0.8" />
+                        </linearGradient>
+                        <filter id="neonBlur">
+                            <feGaussianBlur stdDeviation="2" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                    </defs>
+                </svg>
 
-                {/* 3D BASE (PROJECTOR) */}
-                <div className="absolute bottom-[20%] left-1/2 -translate-x-1/2 w-[350px] h-[60px] bg-primary/20 rounded-[100%] blur-2xl opacity-40 animate-pulse" />
-                <div className="absolute bottom-[22%] left-1/2 -translate-x-1/2 w-[280px] h-[40px] border border-primary/30 rounded-[100%] shadow-[0_0_20px_#14f163] opacity-60" />
-
-                {/* FLOATING DATA-VIZ OVERLAYS */}
-                <div className="absolute top-[15%] left-[5%] font-mono text-[9px] text-primary space-y-1 animate-pulse z-30">
-                    <p className="tracking-widest">&gt; SCAN_LINK: ESTABLISHED</p>
-                    <p className="opacity-60">&gt; TARGET_LOCK: PECL_QUAD_01</p>
-                </div>
-                <div className="absolute top-[40%] right-[2%] font-mono text-[9px] text-primary space-y-1 z-30">
-                    <p className="tracking-widest">&gt; BIOMETRIC_SYNC: 98.4%</p>
-                    <p className="opacity-60">&gt; LATENCY: 12MS</p>
-                </div>
-                <div className="absolute bottom-[35%] left-[8%] font-mono text-[9px] text-primary opacity-70 z-30">
-                    <p>&gt; VOX_PROTOCOL: ACTIVE</p>
-                </div>
-                <div className="absolute top-[10%] right-[10%] font-mono text-[9px] text-primary opacity-80 animate-pulse z-30">
-                    <p>&gt; THREAT_LEVEL: NOMINAL</p>
-                </div>
-
-                {/* DUAL-VIEW BODY MODELS */}
-                <div className="flex w-full justify-around items-center gap-12 relative z-20 silhouette-glow">
-
-                    {/* FRONT VIEW */}
-                    <div className="relative flex-1 max-w-[200px]">
-                        <p className="text-[9px] font-mono text-primary text-center mb-6 tracking-widest uppercase opacity-80 animate-pulse">&gt; HOLO_FRONT</p>
-                        <Model
-                            data={activeMuscles}
-                            highlightedColors={['url(#muscleGlowRed)']}
-                            bodyColor="rgba(20,241,99,0.05)"
-                            type="male"
-                        />
+                <div className="relative z-10 w-full h-full flex flex-col items-center justify-center pt-4 md:pt-8 pb-12">
+                    <div className="flex gap-8 md:gap-20 items-center justify-center scale-90 sm:scale-100 md:scale-110">
+                        {/* Vue de face */}
+                        <div className="relative group">
+                            <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <Model
+                                data={muscleData}
+                                bodyColor="rgba(16, 185, 129, 0.05)"
+                                highlightedColors={["url(#muscleGlowGreen)"]}
+                                onClick={(item) => console.log(item)}
+                            />
+                        </div>
+                        {/* Vue de dos */}
+                        <div className="relative group">
+                            <div className="absolute inset-0 bg-primary/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <Model
+                                type="posterior"
+                                data={muscleData}
+                                bodyColor="rgba(16, 185, 129, 0.05)"
+                                highlightedColors={["url(#muscleGlowGreen)"]}
+                                onClick={(item) => console.log(item)}
+                            />
+                        </div>
                     </div>
 
-                    {/* BACK VIEW */}
-                    <div className="relative flex-1 max-w-[200px]">
-                        <p className="text-[9px] font-mono text-primary text-center mb-6 tracking-widest uppercase opacity-60 animate-pulse">&gt; HOLO_BACK</p>
-                        <Model
-                            data={activeMuscles}
-                            highlightedColors={['url(#muscleGlowRed)']}
-                            bodyColor="rgba(20,241,99,0.05)"
-                            type="male"
-                            backView
-                        />
+                    {/* SOCLE NEON (GREEN) */}
+                    <div className="mt-[-20px] md:mt-[-40px] relative">
+                        <div className="neon-pedestal" />
+                        {/* RAYS / REFLECTIONS */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 md:w-48 h-24 bg-primary/10 blur-3xl rounded-full" />
                     </div>
                 </div>
 
-                {/* STATUS BAR (BOTTOM) */}
-                <div className="absolute bottom-4 left-0 right-0 flex justify-between px-6 font-mono text-[8px] text-primary/60 z-30">
-                    <span>&gt; AUTH_KEY: GOD_MODE_V3</span>
-                    <span className="animate-pulse">RUNNING_HOLOGRAM_V.01</span>
-                </div>
+                <style>{`
+                    .rbh-muscle-highlighted {
+                        filter: url(#neonBlur);
+                        animation: musclePulseGreen 2s infinite ease-in-out;
+                    }
+                    @keyframes musclePulseGreen {
+                        0%, 100% { opacity: 0.8; }
+                        50% { opacity: 1; }
+                    }
+                    .hologram-container {
+                        perspective: 1000px;
+                    }
+                    .silhouette-glow {
+                        filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.3));
+                    }
+                `}</style>
             </div>
-
-            {/* SVG DEFINITIONS */}
-            <svg style={{ width: 0, height: 0, position: 'absolute' }}>
-                <defs>
-                    <radialGradient id="muscleGlowRed" cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor="#ff003c" stopOpacity="0.9" />
-                        <stop offset="100%" stopColor="#660018" stopOpacity="0.1" />
-                    </radialGradient>
-                </defs>
-            </svg>
-
-            {/* HOLOGRAM SHADER & EFFECTS */}
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                .hologram-container {
-                    transform: perspective(1000px) rotateX(10deg) scale(0.95);
-                    opacity: 0.8;
-                    mix-blend-mode: screen;
-                    position: relative;
-                }
-
-                .hologram-container::after {
-                    content: "";
-                    position: absolute;
-                    inset: -50%;
-                    background: repeating-linear-gradient(0deg, transparent, transparent 2px, #000 3px);
-                    opacity: 0.3;
-                    pointer-events: none;
-                    z-index: 50;
-                }
-
-                .silhouette-glow {
-                    filter: drop-shadow(0 0 5px #14f163);
-                    animation: pulse-glow 2s infinite ease-in-out;
-                }
-
-                @keyframes pulse-glow {
-                    0%, 100% { filter: drop-shadow(0 0 5px #14f163) drop-shadow(0 0 15px rgba(20, 241, 99, 0.5)); }
-                    50% { filter: drop-shadow(0 0 8px #14f163) drop-shadow(0 0 25px rgba(20, 241, 99, 0.7)); }
-                }
-
-                .rbh-muscle-highlighted {
-                    filter: drop-shadow(0 0 12px #ff003c);
-                    stroke: #ff003c;
-                    stroke-width: 0.5px;
-                    animation: musclePulse 3s infinite ease-in-out;
-                }
-
-                @keyframes musclePulse {
-                    0%, 100% { fill-opacity: 0.4; }
-                    50% { fill-opacity: 0.9; }
-                }
-            `}} />
         </div>
     );
 };
