@@ -1,0 +1,8 @@
+{
+  "name": "Copy of FitNavi",
+  "description": "Une application de fitness premium alimentée par l'IA pour suivre vos entraînements, analyser vos progrès et recevoir des conseils personnalisés.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
